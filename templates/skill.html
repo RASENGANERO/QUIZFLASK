@@ -1,0 +1,16 @@
+{% include "header.html" %}
+<section class="skill-section">
+    <div class="skill-section-container">
+        <h1 class="skill-partname">{{name}}</h1>
+        <form id="quiz-form" class="skill-form" method="POST">
+            {% for item in data %}
+                <div class="quiz-container">
+                    <p class="quiz-question-name">{{item[1]}}</p>
+                    <input class="quiz-input" quiz-text="true"/>
+                </div>
+            {% endfor %}
+            <button type="submit" id="submitform" number-list="{{number}}" class="submit-quiz">Далее</button>
+        </form> 
+    </div>
+</section>
+{% include "footer.html" %}

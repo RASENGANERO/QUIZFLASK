@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
-</head>
-<body>
-    <h1>{{ title }}</h1>
-    <form id="quiz-form">
-        <p id="question">{{ question }}</p>
-        <input type="text" id="answer" placeholder="Enter your answer here" autocomplete="off">
-        <button type="submit">Submit</button>
-    </form>
-    <script src="{{ url_for('static', filename='quiz.js') }}"></script>
-</body>
-</html>
+{% include "header.html" %}
+    <section class="main-section">
+        <div class="main-section-container">
+            <h1 class="main-section-maintext">Приветствуем на нашем квизе!</h1>
+            <span class="main-section-text">Мы очень надеемся что наш квиз покажется вам интересным, и увлекательным! Проверьте свои знания, отправьте результат друзьям!</span>
+            <a class="main-section-url" href="/skill/1/">Пройти квиз!</a>
+        </div>
+    </section>
+
+{% include "footer.html" %}
 

@@ -1,5 +1,12 @@
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 689-565-144
-INFO:werkzeug:127.0.0.1 - - [10/Oct/2024 20:13:49] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [10/Oct/2024 20:13:49] "[36mGET /static/quiz.js HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [10/Oct/2024 20:13:49] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:45:50] "GET /skillreport/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:45:50] "GET /static/js/jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:45:50] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:45:50] "GET /static/js/quiz.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:45:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:46:35] "GET /skillreport/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:46:35] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:46:35] "GET /static/js/jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:46:35] "GET /static/js/quiz.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [14/Oct/2024 22:46:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -

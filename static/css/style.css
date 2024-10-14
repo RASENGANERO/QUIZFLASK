@@ -1,0 +1,154 @@
+h1,p,body{
+    margin: 0px;
+    padding: 0px;
+}
+.main-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+}
+.main-section-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    background-color: blueviolet;
+    padding: 23px;
+    gap: 23px;
+    max-width: 1200px;
+}
+.main-section-maintext{
+    font-family: "Roboto";
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    
+}
+.main-section-text{
+    font-family: "Roboto";
+    color: white;
+    font-size: 25px;
+    font-weight: 400;
+    text-align: center;
+}
+.main-section-url{
+    color: white;
+    font-family: "Roboto";
+    font-size: 25px;
+    font-weight: 400;
+    text-decoration: none;
+    outline: none;
+    background-color: red;
+    padding: 20px;
+    border-radius: 11px;
+    border: 2px solid black;
+    cursor: pointer;
+    
+}
+.skill-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: blueviolet;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.skill-section-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+}
+.skill-partname{
+    font-family: "Roboto";
+    color: white;
+    font-size: 25px;
+    font-weight: 400;
+    text-align: center;
+}
+.skill-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.quiz-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+.quiz-question-name{
+    font-family: "Roboto";
+    color: white;
+    font-size: 25px;
+    font-weight: 400;
+    text-align: center;
+    max-width: 800px;
+}
+.quiz-input{
+    font-family: "Roboto";
+    color: black;
+    font-size: 20px;
+    font-weight: 400;
+    text-align: left;
+    padding: 5px;
+    outline: none;
+    border: 2px solid black;
+    width: 350px;
+}
+.submit-quiz{
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    font-family: "Roboto";
+    color: white;
+    font-size: 20px;
+    font-weight: 400;
+    border: 2px solid black;
+    border-radius: 4px;
+    background-color: green;
+}
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table thead tr {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.part-row {
+    background-color: #f9f9f9;
+    font-weight: bold;
+    text-align: center;
+}
+
+.part-row td {
+    border-top: 2px solid #4CAF50; /* Отделение заголовка части от данных */
+}

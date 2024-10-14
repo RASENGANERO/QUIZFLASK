@@ -1,214 +1,127 @@
-from __future__ import unicode_literals
-from flask import Flask, render_template, request, jsonify
-import json
-import alice_phrases
+from flask import Flask, render_template, jsonify, session, request, g
 import logging
-import threading
-from random import choice
-# Импортируем подмодули Flask для запуска веб-сервиса.
-from flask import Flask
+import sqlite3
+
+
 app = Flask(__name__)
-
-
+app.secret_key = "43s0d448@$%6"
 logging.basicConfig(level=logging.DEBUG, filename='skill_logs.log', filemode='w')
-# logging.basicConfig(level=logging.DEBUG)
 
-# Хранилище данных о сессиях.
-sessionStorage = {}
+DATABASE = 'quizdb.db'
 
-WAIT = 0
-REPLY = 1
-STOP = 2
+def getMaxParts():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT MAX(quizpart_id) AS COUNT FROM quiz_parts;")
+    data = cursor.fetchone()
+    return int(data[0])
 
-quest_data = json.load(open('quest_data.json'))
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(DATABASE)
+    return g.db
 
-# Задаем параметры приложения Flask
+def get_data(number):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT qq.quest_id, qq.quest_name, qp.quizpart_name FROM quiz_questions AS qq INNER JOIN quiz_parts AS qp ON qq.quest_partid = qp.quizpart_id WHERE qp.quizpart_id=?", (number,))
+    data = cursor.fetchall()
+    return data
 
+def checkDataAnswer(dt1,dt2):
+    if str(dt1).strip().lower()==str(dt2).strip().lower():
+        return 1
+    return 0
 
-@app.route("/skill", methods=['POST'])
-def format_new_question(quest):
-    question = choice(alice_phrases.questions)
-    return question.format(quest=quest)
-
-
-def timer_out(response, user_storage):
-    user_storage['try'] += 1
-    time_up = choice(alice_phrases.answer_time_up)
-    right_answer = choice(alice_phrases.right_answer)
-    real_answer = quest_data[user_storage['answer']]
-    again = choice(alice_phrases.again)
-    response.set_text('{time_up}\n{right_answer}{real_answer}\n{again}'.format(
-        time_up=time_up,
-        right_answer=right_answer,
-        real_answer=real_answer,
-        again=again
-    ))
-    buttons = [{
-        "title": "Да",
-        "hide": True
-    }, {
-        "title": "Нет",
-        "hide": True
-    }]
-    response.set_buttons(buttons)
-    # Выводим кнопочки
-    user_storage['state'] = REPLY
-    # Меняем состояние пользователя
-    return response, user_storage
-
-
-def handle_dialog(request, response, user_storage):
-    if request.is_new_session:
-        # Это новый пользователь. Инициализируем сессию и поприветствуем его.
-        greetings = choice(alice_phrases.greetings)
-        quest = ''
-        user_storage = {
-            'quest': quest,
-            'state': STOP,
-            # STOP-вопрос не задан, Wait-ожидается ответ, Reply - ответ получен
-            'wins': 0,
-            'tries': 0
-        }
-        response.set_text('{greetings}'.format(
-            greetings=greetings
-        ))
-
-    if user_storage.get('state') == STOP:
-        new_quest = choice(alice_phrases.new_quest)
-        response.set_text('{new_quest}'.format(
-            new_quest=new_quest
-                ))
-        buttons = [{
-            "title": "Да",
-            "hide": True
-        }, {
-            "title": "Нет",
-            "hide": True
-        }]
-        response.set_buttons(buttons)
-        if request.command.lower() == 'да':
-            quest = choice(list(quest_data.keys()))
-            user_storage = {
-                'quest': quest,
-                'state': WAIT,
-                'wins': user_storage['wins'],
-                'tries': user_storage['tries']
-            }
-            response.set_text(format_new_question(quest))
-        elif request.command.lower() == 'нет':
-            response.set_text("Хотите выйти?")
-            buttons = [{
-                "title": "Да",
-                "hide": True
-            }, {
-                "title": "Нет",
-                "hide": True
-            }]
-            response.set_buttons(buttons)
-            if request.command.lower() == 'нет':
-                user_storage['state'] = STOP
-            elif request.command.lower() == 'да':
-                response.set_end_session(True)
-                goodbye = choice(alice_phrases.goodbye)
-                response.set_text(goodbye)
-            else:
-                response.set_buttons(buttons)
-                response.set_text('Извините, я не понимаю, вы хотите выйти?')
-        else:
-            buttons = [{
-                "title": "Да",
-                "hide": True
-            }, {
-                "title": "Нет",
-                "hide": True
-            }]
-            response.set_buttons(buttons)
-            response.set_text('Выберите один из двух вариантов - Да или Нет')
-    if user_storage.get('state') == WAIT:
-        # Обрабатываем ответ пользователя
-        timer = threading.Timer(30.0, timer_out)
-        timer.start()
-        if request.command.lower() == quest_data[user_storage['answer']].lower():
-            # Пользователь угадал
-            user_storage['wins'] += 1
-            user_storage['try'] += 1
-            # Добавляем победу и попытку
-            correct = choice(alice_phrases.answer_correct)
-            again = choice(alice_phrases.again)
-            # Выбираем реплику для поздравления
-
-            response.set_text('{correct}\n{again}'.format(
-                correct=correct,
-                again=again
-            ))
-            # Поздравляем и спрашиваем, хочет ли пользователь сыграть ещё раз
-
-            buttons = [{
-                "title": "Да",
-                "hide": True
-            }, {
-                "title": "Нет",
-                "hide": True
-            }]
-            response.set_buttons(buttons)
-            # Выводим кнопочки
-            user_storage['state'] = REPLY
-            # Меняем состояние пользователя
-        else:
-            user_storage['try'] += 1
-            incorrect = choice(alice_phrases.answer_incorrect)
-            right_answer = choice(alice_phrases.right_answer)
-            real_answer = quest_data[user_storage['answer']]
-            again = choice(alice_phrases.again)
-            response.set_text('{incorrect}\n{right_answer}{real_answer}\n{again}'.format(
-                incorrect=incorrect,
-                right_answer=right_answer,
-                real_answer=real_answer,
-                again=again
-            ))
-            buttons = [{
-                "title": "Да",
-                "hide": True
-            }, {
-                "title": "Нет",
-                "hide": True
-            }]
-            response.set_buttons(buttons)
-            # Выводим кнопочки
-            user_storage['state'] = REPLY
-            # Меняем состояние пользователя
-    elif user_storage.get('state') == REPLY:
-        if request.command.lower() == 'да':
-            quest = choice(list(quest_data.keys()))
-            user_storage = {
-                'quest': quest,
-                'state': WAIT,
-                'wins': user_storage['wins'],
-                'tries': user_storage['tries']
-            }
-            response.set_text(format_new_question(quest))
-        elif request.command.lower() == 'нет':
-            response.set_end_session(True)
-            goodbye = choice(alice_phrases.goodbye)
-            response.set_text(goodbye)
-        else:
-            buttons = [{
-                "title": "Да",
-                "hide": True
-            }, {
-                "title": "Нет",
-                "hide": True
-            }]
-            response.set_buttons(buttons)
-            response.set_text('Выберите один из двух вариантов - Да или Нет')
-    return response, user_storage
+def getDataAnswered():
+    dataSess = session['dataAnswer']
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT qq.quest_id, qp.quizpart_name, qp.quizpart_id, qq.quest_name, qq.quest_answer FROM quiz_questions AS qq INNER JOIN quiz_parts AS qp ON qq.quest_partid = qp.quizpart_id")
+    data = cursor.fetchall()
+    from pprint import pprint
+    pprint(data)
+    pprint(dataSess)
+    dataFinal = []
+    dtsq = {}
+    balls=0
+    for v in range(1,getMaxParts()+1):
+        dataAnswers = dataSess["data"+str(v)]
+        dataPart = [a for a in data if a[2]==int(v)]
+         
+        lk = []
+        for pk in range(len(dataPart)):
+            checkes=checkDataAnswer(dataAnswers[int(pk)],dataPart[pk][4])
+            lk.append([
+                dataPart[pk][0],
+                dataPart[pk][3],
+                dataAnswers[int(pk)],
+                dataPart[pk][4],
+                checkes
+                ])
+            balls+=checkes
+        #print(lk)
+        dtsq[dataPart[pk][1]]=lk
+        #print(dtsq)
+    return [dtsq,balls]
 
 
-@app.route("/skill", methods=['GET'])
-def main_get():
-    return 'PLEASE POST'
+def getFormattedData(data):
+    keys = list(data.keys())
+    for v in range(len(keys)):
+        if str(keys[v]).startswith("data")!=True:
+            del data[keys[v]]
+    return data
+
+@app.teardown_appcontext
+def close_db(error):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
+
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/skillreport/", methods=['GET'])
+def skillreport():
+    data = getDataAnswered()
+    return render_template('skillreport.html',data=data[0],balls=data[1])
+
+@app.route("/skill/<int:number>/", methods=['GET'])
+def getskill(number):
+    data = get_data(number)
+    return render_template('skill.html', data=data, name=data[0][2], number=number)
 
 
+@app.route("/skillanswer/<int:number>/", methods=['POST'])
+def skillanswer(number):
+    data_all = request.get_json()  # Получаем данные в формате JSON
+    data_json = [str(a).strip() for a in str(data_all['data']).split("\n")]
 
-if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=False)
+    if 'dataAnswer' not in session or session['dataAnswer'] is None:
+        session['dataAnswer'] = {}
+    
+    dt = session['dataAnswer']
+    
+    dt["data"+str(number)] = data_json
+    dt = getFormattedData(dt)
+    
+    session['dataAnswer'] = dt
+    session.modified = True
+    from pprint import pprint
+    pprint(session['dataAnswer'])
+
+    number = int(data_all['listid']) + 1
+    response_data = {}
+    
+    if int(number) <= int(getMaxParts()):
+        response_data = {"next": str(number), "isfinal": "false"}
+    else:
+        response_data = {"isfinal": "true"}
+
+    return jsonify(response_data)
+
+
+if __name__ == "__main__":
+    app.run('0.0.0.0', port=5000, debug=True)
